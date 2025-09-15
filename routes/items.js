@@ -93,7 +93,7 @@ const deleteItemOptions = {
 
 function itemRoutes(fastify, options, done){
 
-    fastify.get('/items', getItemsOptions,async (request, reply) => {
+    fastify.get('/items', getItemsOptions, async (request, reply) => {
         reply.send({ result: true, message: "Items retrieved successfully.", data: getAllItems() });
     })
 
@@ -104,7 +104,9 @@ function itemRoutes(fastify, options, done){
         if(!item){
             reply.code(404).send({ result: false, message: "Item not found."});
         }
-        reply.send({ result: true, message: "Item retrieved successfully.", data: [item] });
+        else{
+            reply.send({ result: true, message: "Item retrieved successfully.", data: [item] });
+        }
     })
 
     fastify.post('/items', postItemOptions, async (request, reply) => {

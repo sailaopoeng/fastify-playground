@@ -8,6 +8,10 @@ function getNewId() {
     return getLastId() + 1;
 }
 
+function resetItems() {
+    items = require('../models/itemModel');
+}
+
 function getAllItems() {
     return items;
 }
@@ -53,4 +57,4 @@ function deleteItem(id) {
     }
 }
     
-module.exports = { getAllItems, getItemById, addItem, updateItem, deleteItem };
+module.exports = { getAllItems, getItemById, addItem, updateItem, deleteItem, resetItems };
