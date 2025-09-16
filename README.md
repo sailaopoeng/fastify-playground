@@ -13,6 +13,10 @@ This repo is mainly for my hobby projects and testing out features.
 ---
 ## Getting Started
 
+### prepare env file
+- copy .env.example and rename to .env
+- set PORT and JWS_SECRET
+
 ### installation
 `npm install`
 

@@ -1,6 +1,10 @@
 const fastify = require('fastify')({ logger: true });
+const dotenv = require('dotenv');
 
-PORT = 5000; //TODO: move to .env file
+dotenv.config();
+
+const PORT = process.env.PORT || 5000;
+const JWS_SECRET = process.env.JWS_SECRET || 'your_jws_secret_key';
 
 // Register Swagger plugin
 fastify.register(require('@fastify/swagger'), {
