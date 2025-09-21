@@ -1,4 +1,5 @@
-const { getAllItems, getItemById, addItem, updateItem, deleteItem  } = require('../controllers/items')
+const { getAllItems, getItemById, addItem, updateItem, deleteItem  } = require('../controllers/items');
+const { requireAuth } = require('../middleware/auth');
 
 const itemSchema = {
     type: 'object',
@@ -28,7 +29,8 @@ const successResponseWithArraySchema = {
 
 const getItemsOptions = {
     schema: {
-        description: 'Get all items',
+        description: 'Get all items (public endpoint)',
+        tags: ['Items'],
         response: {
             200: successResponseWithArraySchema
         }
@@ -37,7 +39,8 @@ const getItemsOptions = {
 
 const getItemByIdOptions = {
     schema: {
-        description: 'Get item by id',
+        description: 'Get item by id (public endpoint)',
+        tags: ['Items'],
         response: {
             200: successResponseWithArraySchema,
             400: badRequestSchema
@@ -46,8 +49,11 @@ const getItemByIdOptions = {
 }
 
 const postItemOptions = {
+    preHandler: [requireAuth],
     schema: {
-        description: 'Create a new item',
+        description: 'Create a new item (requires authentication)',
+        tags: ['Items'],
+        security: [{ bearerAuth: [] }],
         body: {
             type: 'object',
             properties: {
@@ -58,14 +64,18 @@ const postItemOptions = {
         },
         response: {
             201: successResponseWithArraySchema,
-            400: badRequestSchema
+            400: badRequestSchema,
+            401: badRequestSchema
         }
     }
 }
 
 const updateItemOptions = {
+    preHandler: [requireAuth],
     schema: {
-        description: 'Update an existing item',
+        description: 'Update an existing item (requires authentication)',
+        tags: ['Items'],
+        security: [{ bearerAuth: [] }],
         body: {
             type: 'object',
             properties: {
@@ -76,17 +86,22 @@ const updateItemOptions = {
         },
         response: {
             200: successResponseWithArraySchema,
-            400: badRequestSchema
+            400: badRequestSchema,
+            401: badRequestSchema
         }
     }
 }
 
 const deleteItemOptions = {
+    preHandler: [requireAuth],
     schema: {
-        description: 'Delete an item by id',
+        description: 'Delete an item by id (requires authentication)',
+        tags: ['Items'],
+        security: [{ bearerAuth: [] }],
         response: {
             200: successResponseWithArraySchema,
-            400: badRequestSchema
+            400: badRequestSchema,
+            401: badRequestSchema
         }
     }
 }

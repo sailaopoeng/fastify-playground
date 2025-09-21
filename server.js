@@ -1,23 +1,40 @@
 const fastify = require('fastify')({ logger: true });
-const dotenv = require('dotenv');
+const config = require('./config');
 
-dotenv.config();
+// Register JWT plugin
+fastify.register(require('@fastify/jwt'), {
+    secret: config.jwt.secret,
+    sign: {
+        expiresIn: config.jwt.expiresIn
+    }
+});
 
-const PORT = process.env.PORT || 5000;
-const JWS_SECRET = process.env.JWS_SECRET || 'your_jws_secret_key';
+// Register cookie support for OAuth state
+fastify.register(require('@fastify/cookie'), {
+    secret: config.jwt.secret,
+    parseOptions: {}
+});
 
 // Register Swagger plugin
 fastify.register(require('@fastify/swagger'), {
     swagger: {
         info: {
-            title: 'Fastify API',
-            description: 'Testing the Fastify API',
+            title: 'Fastify API with Authentication',
+            description: 'Testing the Fastify API with JWT and Google OAuth',
             version: '1.0.0'
         },
-        host: `localhost:${PORT}`,
+        host: `localhost:${config.port}`,
         schemes: ['http'],
         consumes: ['application/json'],
-        produces: ['application/json']
+        produces: ['application/json'],
+        securityDefinitions: {
+            bearerAuth: {
+                type: 'apiKey',
+                name: 'Authorization',
+                in: 'header',
+                description: 'Enter JWT token in format: Bearer <token>'
+            }
+        }
     }
 });
 
@@ -26,18 +43,28 @@ fastify.register(require('@fastify/swagger-ui'), {
     routePrefix: '/docs',
     swagger: {
         info: {
-            title: 'Fastify API',
-            description: 'Testing the Fastify API',
+            title: 'Fastify API with Authentication',
+            description: 'Testing the Fastify API with JWT and Google OAuth',
             version: '1.0.0'
         },
-        host: `localhost:${PORT}`,
+        host: `localhost:${config.port}`,
         schemes: ['http'],
         consumes: ['application/json'],
-        produces: ['application/json']
+        produces: ['application/json'],
+        securityDefinitions: {
+            bearerAuth: {
+                type: 'apiKey',
+                name: 'Authorization',
+                in: 'header',
+                description: 'Enter JWT token in format: Bearer <token>'
+            }
+        }
     },
     exposeRoute: true
 });
 
+// Register routes
+fastify.register(require('./routes/auth'));
 fastify.register(require('./routes/items'));
 
 fastify.get('/', async (request, reply) => {
@@ -46,14 +73,18 @@ fastify.get('/', async (request, reply) => {
 
 const start = async () => {
     try {
-        await fastify.listen({ port: PORT });
-        fastify.log.info(`Server listening on port ${PORT}`);
+        await fastify.listen({ port: config.port });
+        fastify.log.info(`Server listening on port ${config.port}`);
+        fastify.log.info(`Swagger docs available at http://localhost:${config.port}/docs`);
+        fastify.log.info(`Google OAuth login at http://localhost:${config.port}/auth/google`);
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
     }
 };
 
-start();
+if (require.main === module) {
+    start();
+}
 
 module.exports = { fastify };
